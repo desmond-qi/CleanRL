@@ -13,7 +13,7 @@ import tyro
 from torch.distributions.categorical import Categorical
 from torch.utils.tensorboard import SummaryWriter
 
-import Qhx_dummy_env
+import dummy_env as dummy_env
 
 @dataclass
 class Args:
@@ -41,9 +41,9 @@ class Args:
     """total timesteps of the experiments"""
     learning_rate: float = 2.5e-4
     """the learning rate of the optimizer"""
-    num_envs: int = 4
+    num_envs: int = 6
     """the number of parallel game environments"""
-    num_steps: int = 128
+    num_steps: int = 256
     """the number of steps to run in each environment per policy rollout"""
     anneal_lr: bool = True
     """Toggle learning rate annealing for policy and value networks"""
@@ -83,9 +83,9 @@ def make_env(env_id, idx, capture_video, run_name):
     def thunk():
         if capture_video and idx == 0:
             env = gym.make(env_id, render_mode="rgb_array")
-            env = gym.wrappers.RecordVideo(env, f"videos/{run_name}")
+            env = gym.wrappers.RecordVideo(env, f"videos/{run_name}", episode_trigger=lambda t: t == 0)
         else:
-            env = gym.make(env_id)
+            env = gym.make(env_id, render_mode=None)
         env = gym.wrappers.RecordEpisodeStatistics(env)
         return env
 
@@ -129,7 +129,6 @@ class Agent(nn.Module):
 
 if __name__ == "__main__":
     args = tyro.cli(Args)
-    args.capture_video = True
     args.batch_size = int(args.num_envs * args.num_steps)
     args.minibatch_size = int(args.batch_size // args.num_minibatches)
     args.num_iterations = args.total_timesteps // args.batch_size
@@ -212,7 +211,7 @@ if __name__ == "__main__":
             if "final_info" in infos:
                 for info in infos["final_info"]:
                     if info and "episode" in info:
-                        print(f"global_step={global_step}, episodic_return={info['episode']['r']}")
+                        # print(f"global_step={global_step}, episodic_return={info['episode']['r']}")
                         writer.add_scalar("charts/episodic_return", info["episode"]["r"], global_step)
                         writer.add_scalar("charts/episodic_length", info["episode"]["l"], global_step)
 
@@ -312,3 +311,11 @@ if __name__ == "__main__":
 
     envs.close()
     writer.close()
+
+    from datetime import datetime
+    # 获取当前系统时间，并格式化为字符串
+    current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    # 构造带有时间戳的模型保存路径
+    model_path = f"model/dummy_model_{current_time}.pth"
+    # 保存模型
+    torch.save(agent.state_dict(), model_path)

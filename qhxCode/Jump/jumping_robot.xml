@@ -1,0 +1,238 @@
+<mujoco model="Humanoid">
+
+	<compiler angle="radian" meshdir="../meshes" />
+	<compiler inertiafromgeom = "false" angle = "radian" />
+	<option timestep = "0.001" iterations = "50" tolerance = "1e-10" jacobian = "dense" cone = "pyramidal" gravity = "0.0 0.0 -9.8" solver = "Newton" impratio = "10" apirate = "144"/>
+	<size nconmax = "1000" njmax = "1000" nuserdata="1000" nuser_actuator="34"/>
+
+	<default>
+		<joint limited = "true" stiffness = "1500" damping = "10" armature = "2.5"/>
+		<motor ctrlrange = " -314.0 314.0" ctrllimited = "true" />
+		<position kp = "15.0" />
+	</default>
+
+	<visual>
+		<map force = "0.025" zfar = "30"/>
+		<rgba haze = "0.15 0.25 0.35 1" com = "1.0 0.1 0.1 1"/>
+		<quality shadowsize = "2048"/>
+		<global offwidth = "800" offheight = "800" fovy = "45" linewidth = "0.1"/>
+		<scale forcewidth = "0.05" contactwidth = "0.1" com = "0.2"/>
+	</visual>
+
+	<asset>
+		<texture name = "texplane"   type = "2d" builtin = "checker" rgb1 = ".2 .3 .4" rgb2 = ".1 0.15 0.2" width = "512" height = "512" mark = "cross" markrgb = ".8 .8 .8" />
+		<texture name = "texgeom" type = "cube" builtin = "flat" mark = "cross" width = "127" height = "1278" rgb1 = "0.8 0.6 0.4" rgb2 = "0.8 0.6 0.4" markrgb = "1 1 1" random = "0.01" />
+		<material name = "matplane" reflectance = "0.3" texture = "texplane" texrepeat = "1 1" texuniform = "true" />
+		<material name = "matgeom" texture = "texgeom" texuniform = "true" rgba = "0.8 0.6 .4 1" />
+		<material name = "robots" shininess = "0.5" reflectance = "0.5" />
+	</asset>
+
+	<worldbody>
+		<geom name = "floor" pos = "0 0 0" size = "0 0 .25" type = "plane" material = "matplane" solref = "0.02 0.0001" friction = "2.5 0.5 0.0001" condim = "3"/>
+
+		<light directional = "false" diffuse = ".2 .2 .2" specular = "0 0 0" pos = "0 0 5" dir = "0 0 -1" castshadow = "false"/>
+		<light mode = "targetbodycom" target = "trunk" directional = "false" diffuse = ".8 .8 .8" specular = "0.3 0.3 0.3" pos = "0 0 4.0" dir = "0 0 -1"/>
+
+		<body name = "trunk" pos = "0 0 1.35000000">
+			<inertial pos = "0 0 -0.25" mass = "24.56000000" diaginertia = "1.27690000 1.01810000 0.50336000"/>
+			<freejoint name = "root"/>
+			<geom name="trunk_goem" type="capsule" fromto="0 0 0 0 0 -0.45" size="0.1" rgba="0.14 0.16 0.16 1" material="robots" group="1" />
+			<site name = "imu" size = "0.01" pos = "0 0 0.1"/>
+			<site name = "imu_2" size = "0.01" pos = "0 0 0.1" euler = "-1.5708 0 0"/>
+			<body name = "hip_right" pos = "0.00000000 -0.10000000 -0.45000000">
+				<inertial pos = "0 0 0" mass = "1.00000000" diaginertia = "0.00889200 0.00802500 0.00802500"/>
+				<joint name = "hip_right_x" type="hinge" pos = "0.00000000 0.00000000 0.00000000" axis = "-1 0 0" range = "-15.00000000 15.00000000"/>
+				<geom name="RHipp_goem" type="capsule" fromto="0 0 0 0 -0.01 0" size="0.05" rgba="0.14 0.16 0.16 1" material="robots"  group="1" />
+				<body name = "thigh_right" pos = "0.00000000 0.00000000 0.00000000">
+					<inertial pos = "-0.00000000 -0.00000000 -0.21100000" mass = "3.32000000" diaginertia = "0.04289200 0.04802500 0.01078400"/>
+					<joint name = "hip_right_y" type="hinge" pos = "0.00000000 0.00000000 0.00000000" axis = "0 -1 0" range = "-35.00000000 100.00000000"/>
+					<geom name="Rthigh_goem" type="capsule" fromto="0 0 -0.05 0 0 -0.4" size="0.04" rgba="0.14 0.16 0.16 1" material="robots"  group="1" />
+					<body name = "calf_right" pos = "0.00000000 0.00000000 -0.45000000">
+						<inertial pos = "-0.00000000 -0.00000000 -0.23000000" mass = "3.30000000" diaginertia = "0.06232800 0.06266400 0.00459200"/>
+						<joint name = "knee_right" type="hinge" pos = "0.00000000 0.00000000 0.00000000" axis = "0 -1 0" range = "-125.00000000 0.00000000"/>
+						<geom name="Rcalf_goem" type="capsule" fromto="0 0 -0.05 0 0 -0.4" size="0.04" rgba="0.14 0.16 0.16 1" material="robots"  group="1" />
+						<body name = "foot_right" pos = "0.00000000 0.00000000 -0.45000000">
+							<inertial pos = "0.05 0 0" mass = "0.50000000" diaginertia = "0.00082700 0.00082700 0.00080000"/>
+							<joint name = "ankle_right_y" type="hinge" pos = "-0.00000000 0.00000000 0.00000000" axis = "0 -1 0" range = "-60.00000000 56.00000000"/>
+							<joint name = "ankle_right_x" type="hinge" pos = "-0.00000000 0.00000000 0.00000000" axis = "-1 0 0" range = "-15.00000000 15.00000000"/>
+							<geom name = "foot_right_geom" pos = "0.05 0 0" type = "box" size = "0.1500000 0.0750000 0.01000000" rgba="0.14 0.16 0.16 1" material="robots"  group="1" />
+							<site name="rf_force"  size="0.01" pos="0.0 0.0 0" />
+						</body>
+					</body>
+				</body>
+			</body>
+			<body name = "hip_left" pos = "0.00000000 0.10000000 -0.45000000">
+				<inertial pos = "0 0 0" mass = "1.00000000" diaginertia = "0.00889200 0.00802500 0.00802500"/>
+				<joint name = "hip_left_x" type="hinge" pos = "0.00000000 0.00000000 0.00000000" axis = "-1 0 0" range = "-15.00000000 15.00000000"/>
+				<geom name="LHipp_goem" type="capsule" fromto="0 0 0 0 0.01 0" size="0.05" rgba="0.14 0.16 0.16 1" material="robots"  group="1" />
+				<body name = "thigh_left" pos = "0.00000000 0.00000000 0.00000000">
+					<inertial pos = "-0.00000000 -0.00000000 -0.21100000" mass = "3.32000000" diaginertia = "0.04289200 0.04802500 0.01078400"/>
+					<joint name = "hip_left_y" type="hinge" pos = "0.00000000 0.00000000 0.00000000" axis = "0 -1 0" range = "-35.00000000 100.00000000"/>
+					<geom name="Lthigh_goem" type="capsule" fromto="0 0 -0.05 0 0 -0.4" size="0.04" rgba="0.14 0.16 0.16 1" material="robots"  group="1" />
+					<body name = "calf_left" pos = "0.00000000 0.00000000 -0.45000000">
+						<inertial pos = "-0.00000000 -0.00000000 -0.23000000" mass = "3.30000000" diaginertia = "0.06232800 0.06266400 0.00459200"/>
+						<joint name = "knee_left" type="hinge" pos = "0.00000000 0.00000000 0.00000000" axis = "0 -1 0" range = "-125.00000000 0.00000000"/>
+						<geom name="Lcalf_goem" type="capsule" fromto="0 0 -0.05 0 0 -0.4" size="0.04" rgba="0.14 0.16 0.16 1" material="robots"  group="1" />
+						<body name = "foot_left" pos = "0.00000000 0.00000000 -0.45000000">
+							<inertial pos = "0.05 0 0" mass = "0.50000000" diaginertia = "0.00082700 0.00082700 0.00080000"/>
+							<joint name = "ankle_left_y" type="hinge" pos = "-0.00000000 0.00000000 0.00000000" axis = "0 -1 0" range = "-60.00000000 56.00000000"/>
+							<joint name = "ankle_left_x" type="hinge" pos = "-0.00000000 0.00000000 0.00000000" axis = "-1 0 0" range = "-15.00000000 15.00000000"/>
+							<geom name = "foot_left_geom" pos = "0.05 0 0" type = "box" size = "0.1500000 0.075000 0.01000000" rgba="0.14 0.16 0.16 1" material="robots"  group="1" />
+							<site name="lf_force"  size="0.01" pos="0.0 0.0 0" />
+						</body>
+					</body>
+				</body>
+			</body>
+			<body name = "arm_right" pos = "0.00000000 -0.25000000 -0.20000000">
+				<joint name = "shoulder_right" type="hinge" pos = "0.00000000 0.00000000 0.00000000" axis = "0 -1 0" range = "-180.00000000 180.00000000"/>
+				<inertial pos = "0 0 -0.25" mass = "2.00000000" diaginertia = "0.04912400 0.04317300 0.00663900"/>
+				<geom name="Rarm_goem" type="capsule" fromto="0 0 0 0 0 -0.4" size="0.05" rgba="0.14 0.16 0.16 1" material="robots"  group="1" />
+			</body>
+			<body name = "arm_left" pos = "0.00000000 0.25000000 -0.20000000">
+				<joint name = "shoulder_left" type="hinge" pos = "0.00000000 0.00000000 0.00000000" axis = "0 -1 0" range = "-180.00000000 180.00000000"/>
+				<inertial pos = "0 0 -0.25" mass = "2.00000000" diaginertia = "0.04912400 0.04317300 0.00663900"/>
+				<geom name="Larm_goem" type="capsule" fromto="0 0 0 0 0 -0.4" size="0.05" rgba="0.14 0.16 0.16 1" material="robots"  group="1" />
+			</body>
+		</body>
+	</worldbody>
+
+	<contact>
+		<exclude body1 = "trunk" body2 = "arm_left" />
+		<exclude body1 = "trunk" body2 = "arm_right" />
+		<exclude body1 = "trunk" body2 = "hip_left" />
+		<exclude body1 = "trunk" body2 = "thigh_left" />
+		<exclude body1 = "trunk" body2 = "calf_left" />
+		<exclude body1 = "trunk" body2 = "foot_left" />
+		<exclude body1 = "trunk" body2 = "hip_right" />
+		<exclude body1 = "trunk" body2 = "thigh_right" />
+		<exclude body1 = "trunk" body2 = "calf_right" />
+		<exclude body1 = "trunk" body2 = "foot_right" />
+		<exclude body1 = "arm_left" body2 = "trunk" />
+		<exclude body1 = "arm_left" body2 = "arm_right" />
+		<exclude body1 = "arm_left" body2 = "hip_left" />
+		<exclude body1 = "arm_left" body2 = "thigh_left" />
+		<exclude body1 = "arm_left" body2 = "calf_left" />
+		<exclude body1 = "arm_left" body2 = "foot_left" />
+		<exclude body1 = "arm_left" body2 = "hip_right" />
+		<exclude body1 = "arm_left" body2 = "thigh_right" />
+		<exclude body1 = "arm_left" body2 = "calf_right" />
+		<exclude body1 = "arm_left" body2 = "foot_right" />
+		<exclude body1 = "arm_right" body2 = "trunk" />
+		<exclude body1 = "arm_right" body2 = "arm_left" />
+		<exclude body1 = "arm_right" body2 = "hip_left" />
+		<exclude body1 = "arm_right" body2 = "thigh_left" />
+		<exclude body1 = "arm_right" body2 = "calf_left" />
+		<exclude body1 = "arm_right" body2 = "foot_left" />
+		<exclude body1 = "arm_right" body2 = "hip_right" />
+		<exclude body1 = "arm_right" body2 = "thigh_right" />
+		<exclude body1 = "arm_right" body2 = "calf_right" />
+		<exclude body1 = "arm_right" body2 = "foot_right" />
+		<exclude body1 = "hip_left" body2 = "trunk" />
+		<exclude body1 = "hip_left" body2 = "arm_left" />
+		<exclude body1 = "hip_left" body2 = "arm_right" />
+		<exclude body1 = "hip_left" body2 = "thigh_left" />
+		<exclude body1 = "hip_left" body2 = "calf_left" />
+		<exclude body1 = "hip_left" body2 = "foot_left" />
+		<exclude body1 = "hip_left" body2 = "hip_right" />
+		<exclude body1 = "hip_left" body2 = "thigh_right" />
+		<exclude body1 = "hip_left" body2 = "calf_right" />
+		<exclude body1 = "hip_left" body2 = "foot_right" />
+		<exclude body1 = "thigh_left" body2 = "trunk" />
+		<exclude body1 = "thigh_left" body2 = "arm_left" />
+		<exclude body1 = "thigh_left" body2 = "arm_right" />
+		<exclude body1 = "thigh_left" body2 = "hip_left" />
+		<exclude body1 = "thigh_left" body2 = "calf_left" />
+		<exclude body1 = "thigh_left" body2 = "foot_left" />
+		<exclude body1 = "thigh_left" body2 = "hip_right" />
+		<exclude body1 = "thigh_left" body2 = "thigh_right" />
+		<exclude body1 = "thigh_left" body2 = "calf_right" />
+		<exclude body1 = "thigh_left" body2 = "foot_right" />
+		<exclude body1 = "calf_left" body2 = "trunk" />
+		<exclude body1 = "calf_left" body2 = "arm_left" />
+		<exclude body1 = "calf_left" body2 = "arm_right" />
+		<exclude body1 = "calf_left" body2 = "hip_left" />
+		<exclude body1 = "calf_left" body2 = "thigh_left" />
+		<exclude body1 = "calf_left" body2 = "foot_left" />
+		<exclude body1 = "calf_left" body2 = "hip_right" />
+		<exclude body1 = "calf_left" body2 = "thigh_right" />
+		<exclude body1 = "calf_left" body2 = "calf_right" />
+		<exclude body1 = "calf_left" body2 = "foot_right" />
+		<exclude body1 = "foot_left" body2 = "trunk" />
+		<exclude body1 = "foot_left" body2 = "arm_left" />
+		<exclude body1 = "foot_left" body2 = "arm_right" />
+		<exclude body1 = "foot_left" body2 = "hip_left" />
+		<exclude body1 = "foot_left" body2 = "thigh_left" />
+		<exclude body1 = "foot_left" body2 = "calf_left" />
+		<exclude body1 = "foot_left" body2 = "hip_right" />
+		<exclude body1 = "foot_left" body2 = "thigh_right" />
+		<exclude body1 = "foot_left" body2 = "calf_right" />
+		<exclude body1 = "foot_left" body2 = "foot_right" />
+		<exclude body1 = "hip_right" body2 = "trunk" />
+		<exclude body1 = "hip_right" body2 = "arm_left" />
+		<exclude body1 = "hip_right" body2 = "arm_right" />
+		<exclude body1 = "hip_right" body2 = "hip_left" />
+		<exclude body1 = "hip_right" body2 = "thigh_left" />
+		<exclude body1 = "hip_right" body2 = "calf_left" />
+		<exclude body1 = "hip_right" body2 = "foot_left" />
+		<exclude body1 = "hip_right" body2 = "thigh_right" />
+		<exclude body1 = "hip_right" body2 = "calf_right" />
+		<exclude body1 = "hip_right" body2 = "foot_right" />
+		<exclude body1 = "thigh_right" body2 = "trunk" />
+		<exclude body1 = "thigh_right" body2 = "arm_left" />
+		<exclude body1 = "thigh_right" body2 = "arm_right" />
+		<exclude body1 = "thigh_right" body2 = "hip_left" />
+		<exclude body1 = "thigh_right" body2 = "thigh_left" />
+		<exclude body1 = "thigh_right" body2 = "calf_left" />
+		<exclude body1 = "thigh_right" body2 = "foot_left" />
+		<exclude body1 = "thigh_right" body2 = "hip_right" />
+		<exclude body1 = "thigh_right" body2 = "calf_right" />
+		<exclude body1 = "thigh_right" body2 = "foot_right" />
+		<exclude body1 = "calf_right" body2 = "trunk" />
+		<exclude body1 = "calf_right" body2 = "arm_left" />
+		<exclude body1 = "calf_right" body2 = "arm_right" />
+		<exclude body1 = "calf_right" body2 = "hip_left" />
+		<exclude body1 = "calf_right" body2 = "thigh_left" />
+		<exclude body1 = "calf_right" body2 = "calf_left" />
+		<exclude body1 = "calf_right" body2 = "foot_left" />
+		<exclude body1 = "calf_right" body2 = "hip_right" />
+		<exclude body1 = "calf_right" body2 = "thigh_right" />
+		<exclude body1 = "calf_right" body2 = "foot_right" />
+		<exclude body1 = "foot_right" body2 = "trunk" />
+		<exclude body1 = "foot_right" body2 = "arm_left" />
+		<exclude body1 = "foot_right" body2 = "arm_right" />
+		<exclude body1 = "foot_right" body2 = "hip_left" />
+		<exclude body1 = "foot_right" body2 = "thigh_left" />
+		<exclude body1 = "foot_right" body2 = "calf_left" />
+		<exclude body1 = "foot_right" body2 = "foot_left" />
+		<exclude body1 = "foot_right" body2 = "hip_right" />
+		<exclude body1 = "foot_right" body2 = "thigh_right" />
+		<exclude body1 = "foot_right" body2 = "calf_right" />
+	</contact>
+	<sensor>
+		<force         name="rf_fsensor"    site="rf_force" />
+		<torque        name="rf_tsensor"    site="rf_force" />
+		<force         name="lf_fsensor"    site="lf_force" />
+		<torque        name="lf_tsensor"    site="lf_force" />
+		<gyro		   name="root_gyro"	  site="imu" />
+		<accelerometer name="root_accel"	  site="imu" />
+		<gyro		   name="root_fpos"	  site="imu"/>
+		<framequat	   name="root_fquat"	  objtype="site"		objname="imu_2" />
+	</sensor>
+
+	<actuator>
+		<position name="hip_left_x" gear="100.00" joint="hip_left_x" />
+		<position name="hip_left_y" gear="100.00" joint="hip_left_y" />
+		<position name="knee_left" gear="100.00" joint="knee_left" />
+		<position name="ankle_left_y" gear="100.00" joint="ankle_left_y" />
+		<position name="ankle_left_x" gear="100.00" joint="ankle_left_x" />
+		<position name="hip_right_x" gear="100.00" joint="hip_right_x" />
+		<position name="hip_right_y" gear="100.00" joint="hip_right_y" />
+		<position name="knee_right" gear="100.00" joint="knee_right" />
+		<position name="ankle_right_y" gear="100.00" joint="ankle_right_y" />
+		<position name="ankle_right_x" gear="100.00" joint="ankle_right_x" />
+		<position name="shoulder_left" gear="100.00" joint = "shoulder_left" />
+		<position name="shoulder_right" gear="100.00" joint="shoulder_right" />
+	</actuator>
+
+
+</mujoco>
